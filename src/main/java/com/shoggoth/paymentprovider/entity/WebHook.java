@@ -9,22 +9,20 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.*;
+import java.util.UUID;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Table(name = "customer")
-public class Customer {
+@Table(name = "webhook")
+public class WebHook {
     @Id
     private UUID id;
-    @Column("first_name")
-    private String firstName;
-    @Column("last_name")
-    private String lastName;
-    @Column("country_code")
-    private String countryCode;
+    @Column("notification_url")
+    private String notificationUrl;
+    @Column("transaction_id")
+    private UUID transactionId;
     @Transient
-    private final Set<PaymentCard> cards = new HashSet<>();
+    private Transaction transaction;
 }
