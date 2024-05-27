@@ -19,8 +19,6 @@ import java.util.UUID;
 public class WebHook {
     @Id
     private UUID id;
-    @Column("notification_url")
-    private String notificationUrl;
     @Column("transaction_id")
     private UUID transactionId;
     @Transient
