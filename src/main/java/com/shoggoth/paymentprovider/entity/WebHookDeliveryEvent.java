@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -26,5 +27,5 @@ public class WebHookDeliveryEvent {
     @Column("response_payload")
     private String response_payload;
     @Column("created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 }

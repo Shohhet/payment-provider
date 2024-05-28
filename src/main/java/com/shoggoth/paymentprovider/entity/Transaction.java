@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -28,13 +28,15 @@ public class Transaction {
     @Column("payment_method")
     private PaymentMethod paymentMethod;
     @Column("created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @Column("updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
     @Column("type")
     private TransactionType type;
     @Column("language_code")
     private String languageCode;
+    @Column("notification_url")
+    private String notificationUrl;
     @Column("status")
     private TransactionStatus status;
     @Column("message")
@@ -47,4 +49,6 @@ public class Transaction {
     private UUID merchantId;
     @Transient
     private Merchant merchant;
+    @Transient
+    private Customer customer;
 }

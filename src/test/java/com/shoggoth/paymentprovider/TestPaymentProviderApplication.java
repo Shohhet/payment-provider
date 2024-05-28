@@ -1,3 +1,4 @@
+/*
 package com.shoggoth.paymentprovider;
 
 import org.springframework.boot.SpringApplication;
@@ -21,3 +22,4 @@ public class TestPaymentProviderApplication {
     }
 
 }
+*/
