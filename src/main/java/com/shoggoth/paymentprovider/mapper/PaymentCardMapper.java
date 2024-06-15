@@ -13,6 +13,8 @@ public interface PaymentCardMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bankAccountId", ignore = true)
     @Mapping(target = "bankAccount", ignore = true)
+    @Mapping(target = "ownerId", ignore = true)
+    @Mapping(target = "owner", ignore = true)
     PaymentCard createDtoToPaymentCard(CreatePaymentCardDto dto);
 
     @Mapping(target = "cardNumber", source = "number")

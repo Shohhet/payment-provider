@@ -19,6 +19,6 @@ public class BankAccount {
     private UUID id;
     @Column("balance")
     private BigDecimal balance;
-    @Column("currency")
+    @Column("currency_code")
     private String currency;
 }

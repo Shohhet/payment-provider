@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -20,11 +21,15 @@ public class PaymentCard {
     @Column("number")
     private String number;
     @Column("expiration_date")
-    private Date expirationDate;
+    private LocalDate expirationDate;
     @Column("cvv")
     private String cvv;
     @Column("bank_account_Id")
     private UUID bankAccountId;
     @Transient
     private BankAccount bankAccount;
+    @Column("owner_id")
+    private UUID ownerId;
+    @Transient
+    private Customer owner;
 }

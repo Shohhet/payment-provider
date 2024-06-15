@@ -11,8 +11,8 @@ CREATE TABLE transaction
     notification_url VARCHAR(2048)   NOT NULL,
     status           VARCHAR(15)     NOT NULL,
     message          VARCHAR(200)    NOT NULL,
-    card_id          UUID,
-    merchant_id      UUID,
+    card_id          UUID NOT NULL,
+    merchant_id      UUID NOT NULL,
     CONSTRAINT transaction_card_fk FOREIGN KEY (card_id) REFERENCES card (id),
     CONSTRAINT transaction_merchant_fk FOREIGN KEY (merchant_id) REFERENCES merchant (id)
 );
