@@ -1,7 +1,7 @@
 package com.shoggoth.paymentprovider.mapper;
 
 import com.shoggoth.paymentprovider.dto.CreatePaymentCardDto;
-import com.shoggoth.paymentprovider.dto.PaymentCardNumberDto;
+import com.shoggoth.paymentprovider.dto.GetPaymentCardDto;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +18,7 @@ public interface PaymentCardMapper {
     PaymentCard createDtoToPaymentCard(CreatePaymentCardDto dto);
 
     @Mapping(target = "cardNumber", source = "number")
-    PaymentCardNumberDto paymentCardToGetDto(PaymentCard paymentCard);
+    GetPaymentCardDto paymentCardToGetDto(PaymentCard paymentCard);
 
 
 }

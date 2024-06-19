@@ -2,7 +2,7 @@ package com.shoggoth.paymentprovider.rest;
 
 import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionRequestDto;
 import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionResponseDto;
-import com.shoggoth.paymentprovider.dto.GetTopUpTransactionResponseDto;
+import com.shoggoth.paymentprovider.dto.GetTopUpTransactionDto;
 import com.shoggoth.paymentprovider.service.TopUpTransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +19,11 @@ public class TopUpRestControllerV1 {
 
     @PostMapping("/top_up")
     public Mono<CreateTopUpTransactionResponseDto> create(@RequestBody CreateTopUpTransactionRequestDto createDto) {
-        return topUpTransactionService.create(createDto);
+        return topUpTransactionService.createTopUpTransaction(createDto);
     }
 
     @GetMapping("/top_up/{id}/details")
-    public Mono<GetTopUpTransactionResponseDto> getTopUpTransactions(@PathVariable UUID id) {
+    public Mono<GetTopUpTransactionDto> getTopUpTransactions(@PathVariable UUID id) {
         return topUpTransactionService.getTopUpDetails(id);
     }
 

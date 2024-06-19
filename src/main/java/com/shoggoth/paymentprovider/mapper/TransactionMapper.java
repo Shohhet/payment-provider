@@ -2,7 +2,7 @@ package com.shoggoth.paymentprovider.mapper;
 
 import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionRequestDto;
 import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionResponseDto;
-import com.shoggoth.paymentprovider.dto.GetTopUpTransactionResponseDto;
+import com.shoggoth.paymentprovider.dto.GetTopUpTransactionDto;
 import com.shoggoth.paymentprovider.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,6 +29,6 @@ public interface TransactionMapper {
     @Mapping(target = "topUpId", source = "id")
     @Mapping(target = "cardData", source = "card")
     @Mapping(target = "language", source = "languageCode")
-    GetTopUpTransactionResponseDto transactionToGetDto(Transaction transaction);
+    GetTopUpTransactionDto transactionToGetDto(Transaction transaction);
 
 }

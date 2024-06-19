@@ -23,7 +23,7 @@ public class Merchant {
     @Column("secret_key")
     private String secretKey;
     @Transient
-    private final Set<BankAccount> bankAccounts = new HashSet<>();
+    private List<BankAccount> bankAccounts;
 }
 
 

@@ -1,6 +1,7 @@
 package com.shoggoth.paymentprovider.service.impl;
 
 import com.shoggoth.paymentprovider.entity.Merchant;
+import com.shoggoth.paymentprovider.repository.BankAccountRepository;
 import com.shoggoth.paymentprovider.repository.MerchantRepository;
 import com.shoggoth.paymentprovider.service.MerchantService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class MerchantServiceImpl implements MerchantService {
 
     private final MerchantRepository merchantRepository;
+    private final BankAccountRepository bankAccountRepository;
 
     @Override
     public Mono<Merchant> getAuthenticatedMerchant() {
@@ -24,6 +26,16 @@ public class MerchantServiceImpl implements MerchantService {
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getName)
                 .map(UUID::fromString)
-                .flatMap(merchantRepository::findById);
+                .flatMap(merchantRepository::findById)
+                .zipWhen(merchant ->
+                        bankAccountRepository.findBankAccountsByMerchantId(merchant.getId())
+                                .collectList())
+                .map(tuple -> {
+                            var merchant = tuple.getT1();
+                            var bankAccounts = tuple.getT2();
+                            merchant.setBankAccounts(bankAccounts);
+                            return merchant;
+                        }
+                );
     }
 }

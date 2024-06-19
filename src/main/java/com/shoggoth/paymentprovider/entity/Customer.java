@@ -26,5 +26,5 @@ public class Customer {
     @Column("country_code")
     private String countryCode;
     @Transient
-    private final Set<PaymentCard> cards = new HashSet<>();
+    private List<PaymentCard> cards;
 }

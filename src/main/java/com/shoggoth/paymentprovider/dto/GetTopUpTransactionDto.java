@@ -10,14 +10,14 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record GetTopUpTransactionResponseDto(
+public record GetTopUpTransactionDto(
         PaymentMethod paymentMethod,
         String amount,
         String currency,
         UUID topUpId,
         Date createdAt,
         Date updatedAt,
-        PaymentCardNumberDto cardData,
+        GetPaymentCardDto cardData,
         String language,
         String notificationUrl,
         CustomerDto customer,
