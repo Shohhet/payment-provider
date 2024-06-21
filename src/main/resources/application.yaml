@@ -4,4 +4,3 @@ spring:
       lifecycle-management: start_only
 customer-balance:
   default-amount: 1000
-
