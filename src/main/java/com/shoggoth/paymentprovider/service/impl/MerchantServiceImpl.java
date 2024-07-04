@@ -26,16 +26,6 @@ public class MerchantServiceImpl implements MerchantService {
                 .map(SecurityContext::getAuthentication)
                 .map(Authentication::getName)
                 .map(UUID::fromString)
-                .flatMap(merchantRepository::findById)
-                .zipWhen(merchant ->
-                        bankAccountRepository.findBankAccountsByMerchantId(merchant.getId())
-                                .collectList())
-                .map(tuple -> {
-                            var merchant = tuple.getT1();
-                            var bankAccounts = tuple.getT2();
-                            merchant.setBankAccounts(bankAccounts);
-                            return merchant;
-                        }
-                );
+                .flatMap(merchantRepository::findById);
     }
 }

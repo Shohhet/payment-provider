@@ -1,8 +1,6 @@
 package com.shoggoth.paymentprovider.service;
 
-import com.shoggoth.paymentprovider.dto.CreatePaymentCardDto;
 import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionRequestDto;
-import com.shoggoth.paymentprovider.dto.CustomerDto;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
 import reactor.core.publisher.Mono;
 

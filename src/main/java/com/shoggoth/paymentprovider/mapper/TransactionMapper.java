@@ -7,7 +7,7 @@ import com.shoggoth.paymentprovider.entity.Transaction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {PaymentCardMapper.class, CustomerMapper.class})
+@Mapper(componentModel = "spring", uses = {PaymentCardMapper.class, CustomerMapper.class, PaymentMethodMapper.class})
 public interface TransactionMapper {
 
     @Mapping(target = "id", ignore = true)

@@ -8,5 +8,4 @@ import java.util.UUID;
 
 public interface TransactionRepository extends R2dbcRepository<Transaction, UUID> {
     Mono<Transaction> findTransactionByIdAndMerchantId(UUID id, UUID merchantId);
-
 }

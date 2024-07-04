@@ -12,5 +12,6 @@ import java.util.UUID;
 public interface TopUpTransactionService {
     Mono<CreateTopUpTransactionResponseDto> createTopUpTransaction(CreateTopUpTransactionRequestDto transactionDto);
     Mono<GetTopUpTransactionDto> getTopUpDetails(UUID id);
+    Flux<GetTopUpTransactionDto> getTopUps();
     Flux<GetTopUpTransactionDto> getTopUps(Date startDate, Date endDate);
 }

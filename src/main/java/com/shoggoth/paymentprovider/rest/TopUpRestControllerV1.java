@@ -5,6 +5,7 @@ import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionResponseDto;
 import com.shoggoth.paymentprovider.dto.GetTopUpTransactionDto;
 import com.shoggoth.paymentprovider.service.TopUpTransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +19,7 @@ public class TopUpRestControllerV1 {
     private final TopUpTransactionService topUpTransactionService;
 
     @PostMapping("/top_up")
-    public Mono<CreateTopUpTransactionResponseDto> create(@RequestBody CreateTopUpTransactionRequestDto createDto) {
+    public Mono<CreateTopUpTransactionResponseDto> create(@RequestBody @Validated CreateTopUpTransactionRequestDto createDto) {
         return topUpTransactionService.createTopUpTransaction(createDto);
     }
 

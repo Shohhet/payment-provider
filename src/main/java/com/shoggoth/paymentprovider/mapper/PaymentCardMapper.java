@@ -27,7 +27,6 @@ public interface PaymentCardMapper {
 
     @Named("yearMonthToLocalDate")
     static LocalDate yearMonthToLocalDate(YearMonth yearMonth) {
-        System.out.println(yearMonth);
         return yearMonth.atEndOfMonth();
     }
 }

@@ -3,16 +3,15 @@ package com.shoggoth.paymentprovider.service.impl;
 import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionRequestDto;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
 import com.shoggoth.paymentprovider.exception.NotEnoughFoundsException;
-import com.shoggoth.paymentprovider.mapper.CustomerMapperImpl;
 import com.shoggoth.paymentprovider.mapper.PaymentCardMapper;
-import com.shoggoth.paymentprovider.mapper.PaymentCardMapperImpl;
 import com.shoggoth.paymentprovider.repository.BankAccountRepository;
 import com.shoggoth.paymentprovider.repository.CustomerRepository;
 import com.shoggoth.paymentprovider.repository.PaymentCardRepository;
+import com.shoggoth.paymentprovider.service.BankAccountService;
 import com.shoggoth.paymentprovider.service.CustomerService;
 import com.shoggoth.paymentprovider.service.PaymentCardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -21,17 +20,16 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PaymentCardServiceImpl implements PaymentCardService {
 
-    @Value("${customer-balance.default-amount}")
-    private BigDecimal defaultAmount;
 
     private final CustomerService customerService;
     private final PaymentCardMapper paymentCardMapper;
     private final PaymentCardRepository paymentCardRepository;
-    private final BankAccountRepository bankAccountRepository;
+    private final BankAccountService bankAccountService;
     private final CustomerRepository customerRepository;
-    private final CustomerMapperImpl customerMapper;
+    private final BankAccountRepository bankAccountRepository;
 
 
     @Override
@@ -58,6 +56,16 @@ public class PaymentCardServiceImpl implements PaymentCardService {
                             return newPaymentCard;
                         }
                 )
+                .zipWith(
+                        bankAccountService.createDefaultBankAccount(transactionDto.currency())
+                )
+                .map(tuple -> {
+                    var paymentCard = tuple.getT1();
+                    var bankAccount = tuple.getT2();
+                    paymentCard.setBankAccount(bankAccount);
+                    paymentCard.setBankAccountId(bankAccount.getId());
+                    return paymentCard;
+                })
                 .flatMap(paymentCardRepository::save);
     }
 
@@ -83,9 +91,10 @@ public class PaymentCardServiceImpl implements PaymentCardService {
                         bankAccountRepository.findById(paymentCard.getBankAccountId())
                 )
                 .map(tuple -> {
-                    paymentCard.setOwner(tuple.getT1());
-                    paymentCard.setBankAccount(tuple.getT2());
-                    return paymentCard;
-                });
+                            paymentCard.setOwner(tuple.getT1());
+                            paymentCard.setBankAccount(tuple.getT2());
+                            return paymentCard;
+                        }
+                );
     }
 }
