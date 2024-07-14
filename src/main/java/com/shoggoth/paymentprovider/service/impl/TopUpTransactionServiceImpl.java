@@ -8,12 +8,12 @@ import com.shoggoth.paymentprovider.repository.TransactionRepository;
 import com.shoggoth.paymentprovider.service.MerchantService;
 import com.shoggoth.paymentprovider.service.PaymentCardService;
 import com.shoggoth.paymentprovider.service.TopUpTransactionService;
-import com.shoggoth.paymentprovider.service.WebHookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Date;
@@ -27,7 +27,6 @@ public class TopUpTransactionServiceImpl implements TopUpTransactionService {
     private final TransactionMapper transactionMapper;
     private final PaymentCardService paymentCardService;
     private final MerchantService merchantService;
-    private final WebHookService webHookService;
 
 
     @Override
@@ -46,14 +45,14 @@ public class TopUpTransactionServiceImpl implements TopUpTransactionService {
                 .switchIfEmpty(paymentCardService.createPaymentCard(transactionDto))
                 .flatMap(card -> paymentCardService.reserveFounds(card, transactionDto.amount())
                         .map(paymentCard -> transactionMapper.createRequestDtoToTransaction(transactionDto).toBuilder()
-                                 .paymentCardId(paymentCard.getId())
-                                 .type(TransactionType.TOP_UP)
-                                 .createdAt(LocalDateTime.now())
-                                 .updatedAt(LocalDateTime.now())
-                                 .status(TransactionStatus.IN_PROGRESS)
-                                 .message("Transaction created.")
-                                 .customer(paymentCard.getOwner())
-                                 .build()
+                                .paymentCardId(paymentCard.getId())
+                                .type(TransactionType.TOP_UP)
+                                .createdAt(LocalDateTime.now())
+                                .updatedAt(LocalDateTime.now())
+                                .status(TransactionStatus.IN_PROGRESS)
+                                .message("Transaction created.")
+                                .customer(paymentCard.getOwner())
+                                .build()
                         )
                         .zipWith(merchantService.getAuthenticatedMerchant())
                         .flatMap(tuple -> {
@@ -68,8 +67,6 @@ public class TopUpTransactionServiceImpl implements TopUpTransactionService {
                                     }
                                 }
                         )
-                        .flatMap(webHookService::createWebHook)
-                        .map(WebHook::getTransaction)
                         .map(transactionMapper::transactionToCreateResponseDto));
     }
 
@@ -91,7 +88,8 @@ public class TopUpTransactionServiceImpl implements TopUpTransactionService {
 
     @Override
     public Flux<GetTopUpTransactionDto> getTopUps() {
-        return null;
+        return transactionRepository.findTransactionByCreatedAtBetween(LocalDate.now().atStartOfDay(), LocalDateTime.now())
+                .map(transactionMapper::transactionToGetDto);
     }
 
     @Override

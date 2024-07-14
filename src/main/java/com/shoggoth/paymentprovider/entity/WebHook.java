@@ -22,8 +22,7 @@ public class WebHook {
     private UUID id;
     @Column("transaction_id")
     private UUID transactionId;
+    @Column
     @Transient
     private Transaction transaction;
-    @Transient
-    private List<WebHookDeliveryEvent> events;
 }

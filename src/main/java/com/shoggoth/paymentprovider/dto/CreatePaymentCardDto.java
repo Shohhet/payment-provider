@@ -1,6 +1,7 @@
 package com.shoggoth.paymentprovider.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -21,11 +22,12 @@ public record CreatePaymentCardDto(
         @LuhnCheck()
         String cardNumber,
 
+        @JsonProperty("exp_date")
         @JsonSerialize(using = YearMonthSerializer.class)
         @JsonDeserialize(using = YearMonthDeserializer.class)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM/yy")
-        @NotNull
-                @CardExpirationDate
+        @NotNull()
+        @CardExpirationDate()
         YearMonth expirationDate,
 
         @NotNull

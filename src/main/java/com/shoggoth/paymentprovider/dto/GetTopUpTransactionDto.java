@@ -17,7 +17,7 @@ public record GetTopUpTransactionDto(
         UUID topUpId,
         Date createdAt,
         Date updatedAt,
-        GetPaymentCardDto cardData,
+        PaymentCardNumberDto cardData,
         String language,
         String notificationUrl,
         CustomerDto customer,
