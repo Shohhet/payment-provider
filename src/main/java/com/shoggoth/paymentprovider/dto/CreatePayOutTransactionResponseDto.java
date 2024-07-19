@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record CreatePayOutTransactionResponseDto(
-        UUID payOut,
+        UUID payOutId,
         TransactionStatus status,
         String message
 ) {

@@ -6,6 +6,8 @@ import com.shoggoth.paymentprovider.dto.GetTopUpTransactionDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,5 +15,5 @@ public interface TopUpTransactionService {
     Mono<CreateTopUpTransactionResponseDto> createTopUpTransaction(CreateTopUpTransactionRequestDto transactionDto);
     Mono<GetTopUpTransactionDto> getTopUpDetails(UUID id);
     Flux<GetTopUpTransactionDto> getTopUps();
-    Flux<GetTopUpTransactionDto> getTopUps(Date startDate, Date endDate);
+    Flux<GetTopUpTransactionDto> getTopUps(LocalDateTime startDate, LocalDateTime endDate);
 }

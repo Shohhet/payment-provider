@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @RestController
@@ -30,8 +33,18 @@ public class TopUpRestControllerV1 {
     }
 
     @GetMapping("/list")
-    public Flux<GetTopUpTransactionDto>  getTopUpTransactionsList() {
+    public Flux<GetTopUpTransactionDto> getTopUpTransactionsList() {
         return topUpTransactionService.getTopUps();
+    }
+
+    @GetMapping(value = "/list", params = {"start_date", "end_date"})
+    public Flux<GetTopUpTransactionDto> getTopUpTransactionsList(@RequestParam(name = "start_date") Long startDate,
+                                                                 @RequestParam(name = "end_date") Long endDate) {
+        var timeZone = ZoneId.systemDefault();
+        return topUpTransactionService.getTopUps(
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(startDate), timeZone),
+                LocalDateTime.ofInstant(Instant.ofEpochMilli(endDate), timeZone)
+        );
     }
 
 }
