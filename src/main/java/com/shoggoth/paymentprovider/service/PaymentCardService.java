@@ -1,10 +1,9 @@
 package com.shoggoth.paymentprovider.service;
 
-import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionRequestDto;
+import com.shoggoth.paymentprovider.dto.CreateTransactionRequest;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface PaymentCardService {
@@ -12,7 +11,6 @@ public interface PaymentCardService {
 
     Mono<PaymentCard> getPaymentCardById(UUID id);
 
-    Mono<PaymentCard> createPaymentCard(CreateTopUpTransactionRequestDto transactionDto);
+    Mono<PaymentCard> getOrCreatePaymentCard(CreateTransactionRequest requestPayload);
 
-    Mono<PaymentCard> reserveFounds(PaymentCard paymentCard, BigDecimal amount);
 }

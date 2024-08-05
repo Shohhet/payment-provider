@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.shoggoth.paymentprovider.validation.Alfa2CountryCode;
 import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.Length;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record CustomerDto(
+public record CustomerRequestResponse(
         @NotBlank
         @Size(min = 2, max = 50)
         @Pattern(regexp = "^[A-Za-z]*$")

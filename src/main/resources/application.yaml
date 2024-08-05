@@ -2,5 +2,14 @@ spring:
   docker:
     compose:
       lifecycle-management: start_only
+
 customer-balance:
   default-amount: 1000
+
+logging:
+  level:
+    root: info
+
+server:
+  error:
+    include-stacktrace: never

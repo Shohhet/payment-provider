@@ -12,6 +12,6 @@ import java.util.UUID;
 
 public interface TransactionRepository extends R2dbcRepository<Transaction, UUID> {
     Mono<Transaction> findByIdAndMerchantIdAndType(UUID id, UUID merchantId, TransactionType type);
-    Flux<Transaction> findByCreatedAtBetweenAndMerchantIdAndType(LocalDateTime createdAt, LocalDateTime createdAt2, UUID merchantId, TransactionType type);
+    Flux<Transaction> findByCreatedAtBetweenAndMerchantIdAndType(LocalDateTime begin, LocalDateTime end, UUID merchantId, TransactionType type);
     Flux<Transaction> findByStatus(TransactionStatus transactionStatus);
 }

@@ -1,6 +1,6 @@
 package com.shoggoth.paymentprovider.mapper;
 
-import com.shoggoth.paymentprovider.dto.CustomerDto;
+import com.shoggoth.paymentprovider.dto.CustomerRequestResponse;
 import com.shoggoth.paymentprovider.entity.Customer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,8 +10,8 @@ public interface CustomerMapper {
 
     @Mapping(target = "countryCode", source = "country")
     @Mapping(target = "id", ignore = true)
-    Customer dtoToCustomer(CustomerDto customerDto);
+    Customer requestToCustomer(CustomerRequestResponse customerDto);
 
     @Mapping(target = "country", source = "countryCode")
-    CustomerDto customerToDto(Customer customer);
+    CustomerRequestResponse customerToResponse(Customer customer);
 }

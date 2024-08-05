@@ -12,7 +12,8 @@ import org.hibernate.validator.constraints.URL;
 import java.math.BigDecimal;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record CreatePayOutTransactionRequestDto(
+public record CreateTransactionRequest(
+
         @NotNull
         PaymentMethod paymentMethod,
 
@@ -28,7 +29,7 @@ public record CreatePayOutTransactionRequestDto(
         String currency,
 
         @Valid
-        PaymentCardNumberDto cardData,
+        PaymentCardRequest cardData,
 
         @NotNull
         @NotBlank
@@ -41,7 +42,6 @@ public record CreatePayOutTransactionRequestDto(
         String notificationUrl,
 
         @Valid
-        CustomerDto customer
+        CustomerRequestResponse customer
 ) {
-
 }

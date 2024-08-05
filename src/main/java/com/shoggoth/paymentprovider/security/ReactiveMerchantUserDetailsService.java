@@ -1,6 +1,6 @@
 package com.shoggoth.paymentprovider.security;
 
-import com.shoggoth.paymentprovider.exception.AuthenticationException;
+import com.shoggoth.paymentprovider.exception.MerchantAuthenticationException;
 import com.shoggoth.paymentprovider.repository.MerchantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -20,7 +20,7 @@ public class ReactiveMerchantUserDetailsService implements ReactiveUserDetailsSe
     public Mono<UserDetails> findByUsername(String username) {
         return merchantRepository.findById(UUID.fromString(username))
                 .switchIfEmpty(
-                        Mono.error(new AuthenticationException("Merchant with ID# %s does not exist.".formatted(username)))
+                        Mono.error(new MerchantAuthenticationException("Merchant with ID# %s does not exist.".formatted(username), "AUTH_ERROR"))
                 )
                 .map(MerchantUserDetails::new);
     }

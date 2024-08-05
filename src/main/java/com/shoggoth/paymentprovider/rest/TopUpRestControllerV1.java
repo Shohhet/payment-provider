@@ -1,9 +1,10 @@
 package com.shoggoth.paymentprovider.rest;
 
-import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionRequestDto;
-import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionResponseDto;
-import com.shoggoth.paymentprovider.dto.GetTopUpTransactionDto;
-import com.shoggoth.paymentprovider.service.TopUpTransactionService;
+import com.shoggoth.paymentprovider.dto.CreateTransactionRequest;
+import com.shoggoth.paymentprovider.dto.CreateTransactionResponse;
+import com.shoggoth.paymentprovider.dto.GetTransactionResponse;
+import com.shoggoth.paymentprovider.service.TransactionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,33 +16,37 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
+import static com.shoggoth.paymentprovider.entity.TransactionType.PAY_OUT;
+import static com.shoggoth.paymentprovider.entity.TransactionType.TOP_UP;
+
 @RestController
 @RequestMapping("api/v1/payments/top_up")
 @RequiredArgsConstructor
 public class TopUpRestControllerV1 {
 
-    private final TopUpTransactionService topUpTransactionService;
+    private final TransactionService transactionService;
 
     @PostMapping("/")
-    public Mono<CreateTopUpTransactionResponseDto> create(@RequestBody @Validated CreateTopUpTransactionRequestDto createDto) {
-        return topUpTransactionService.createTopUpTransaction(createDto);
+    public Mono<CreateTransactionResponse> createPayOutTransaction(@RequestBody @Valid CreateTransactionRequest payload) {
+        return transactionService.createTransaction(TOP_UP, payload);
     }
 
     @GetMapping("/{id}/details")
-    public Mono<GetTopUpTransactionDto> getTopUpTransaction(@PathVariable UUID id) {
-        return topUpTransactionService.getTopUpDetails(id);
+    public Mono<GetTransactionResponse> getPayOutTransaction(@PathVariable UUID id) {
+        return transactionService.getTransactionDetails(TOP_UP, id);
     }
 
     @GetMapping("/list")
-    public Flux<GetTopUpTransactionDto> getTopUpTransactionsList() {
-        return topUpTransactionService.getTopUps();
+    public Flux<GetTransactionResponse> getPayOutTransactionsList() {
+        return transactionService.getTransactions(TOP_UP);
     }
 
     @GetMapping(value = "/list", params = {"start_date", "end_date"})
-    public Flux<GetTopUpTransactionDto> getTopUpTransactionsList(@RequestParam(name = "start_date") Long startDate,
+    public Flux<GetTransactionResponse> getTopUpTransactionsList(@RequestParam(name = "start_date") Long startDate,
                                                                  @RequestParam(name = "end_date") Long endDate) {
         var timeZone = ZoneId.systemDefault();
-        return topUpTransactionService.getTopUps(
+        return transactionService.getTransactions(
+                TOP_UP,
                 LocalDateTime.ofInstant(Instant.ofEpochMilli(startDate), timeZone),
                 LocalDateTime.ofInstant(Instant.ofEpochMilli(endDate), timeZone)
         );

@@ -14,6 +14,7 @@ import java.util.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 @Table(name = "customer")
 public class Customer {
     @Id
@@ -24,6 +25,4 @@ public class Customer {
     private String lastName;
     @Column("country_code")
     private String countryCode;
-    @Transient
-    private List<PaymentCard> cards;
 }

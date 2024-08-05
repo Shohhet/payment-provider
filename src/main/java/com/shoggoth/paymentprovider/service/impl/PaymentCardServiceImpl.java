@@ -1,8 +1,7 @@
 package com.shoggoth.paymentprovider.service.impl;
 
-import com.shoggoth.paymentprovider.dto.CreateTopUpTransactionRequestDto;
+import com.shoggoth.paymentprovider.dto.CreateTransactionRequest;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
-import com.shoggoth.paymentprovider.exception.NotEnoughFoundsException;
 import com.shoggoth.paymentprovider.mapper.PaymentCardMapper;
 import com.shoggoth.paymentprovider.repository.BankAccountRepository;
 import com.shoggoth.paymentprovider.repository.CustomerRepository;
@@ -15,14 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PaymentCardServiceImpl implements PaymentCardService {
-
 
     private final CustomerService customerService;
     private final PaymentCardMapper paymentCardMapper;
@@ -45,44 +42,35 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     }
 
     @Override
-    public Mono<PaymentCard> createPaymentCard(CreateTopUpTransactionRequestDto transactionDto) {
-        var customerDto = transactionDto.customer();
-        var newPaymentCard = paymentCardMapper.createDtoToPaymentCard(transactionDto.cardData());
-        return customerService.findCustomerByPersonalData(customerDto)
-                .switchIfEmpty(customerService.createCustomer(customerDto))
-                .map(customer -> {
-                            newPaymentCard.setOwnerId(customer.getId());
-                            newPaymentCard.setOwner(customer);
-                            return newPaymentCard;
-                        }
-                )
-                .zipWith(
-                        bankAccountService.createDefaultBankAccount(transactionDto.currency())
-                )
-                .map(tuple -> {
-                    var paymentCard = tuple.getT1();
-                    var bankAccount = tuple.getT2();
-                    paymentCard.setBankAccount(bankAccount);
-                    paymentCard.setBankAccountId(bankAccount.getId());
-                    return paymentCard;
-                })
-                .flatMap(paymentCardRepository::save);
+    public Mono<PaymentCard> getOrCreatePaymentCard(CreateTransactionRequest requestPayload) {
+
+        return paymentCardRepository.findPaymentCardByNumber(requestPayload.cardData().cardNumber())
+                .doOnSuccess(pc -> log.debug("Get existing payment card: {}", pc))
+                .switchIfEmpty(createNewPaymentCard(requestPayload))
+                .doOnSuccess(pc -> log.debug("Create new payment card: {}", pc))
+                .doOnError(throwable -> log.error("Error creating new payment card: {}", throwable.getMessage()));
+
+
     }
 
-    @Override
-    public Mono<PaymentCard> reserveFounds(PaymentCard paymentCard, BigDecimal amount) {
-        return bankAccountRepository.findById(paymentCard.getBankAccountId())
-                .flatMap(bankAccount -> {
-                            var currentBalance = bankAccount.getBalance();
-                            if (currentBalance.compareTo(amount) < 0) {
-                                return Mono.error(new NotEnoughFoundsException("Not enough founds for top up."));
-                            } else {
-                                bankAccount.setBalance(currentBalance.subtract(amount));
-                                return bankAccountRepository.save(bankAccount);
-                            }
+    private Mono<PaymentCard> createNewPaymentCard(CreateTransactionRequest requestPayload) {
+        var paymentCard = paymentCardMapper.requestToPaymentCard(requestPayload.cardData());
+        return Mono.zip(Mono.just(paymentCard),
+                        customerService.getCustomer(requestPayload.customer()),
+                        bankAccountService.createDefaultBankAccount(requestPayload.currency()))
+                .map(t -> {
+                            var card = t.getT1();
+                            var customer = t.getT2();
+                            var bankAccount = t.getT3();
+                            card.setOwnerId(customer.getId());
+                            card.setBankAccountId(bankAccount.getId());
+                            return card;
                         }
                 )
-                .map(bankAccount -> paymentCard);
+                .flatMap(paymentCardRepository::save)
+                .flatMap(this::setRelatedEntities);
+
+
     }
 
     private Mono<PaymentCard> setRelatedEntities(PaymentCard paymentCard) {

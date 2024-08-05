@@ -15,7 +15,7 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import java.time.YearMonth;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record CreatePaymentCardDto(
+public record PaymentCardRequest(
         @NotNull
         @NotEmpty
         @NotBlank
@@ -26,11 +26,10 @@ public record CreatePaymentCardDto(
         @JsonSerialize(using = YearMonthSerializer.class)
         @JsonDeserialize(using = YearMonthDeserializer.class)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM/yy")
-        @NotNull()
-        @CardExpirationDate()
+        @Future
         YearMonth expirationDate,
 
-        @NotNull
+
         @Size(min = 3, max = 3)
         @Pattern(regexp = "^[0-9]*$")
         String cvv

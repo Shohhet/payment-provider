@@ -1,7 +1,6 @@
 package com.shoggoth.paymentprovider.service.impl;
 
 import com.shoggoth.paymentprovider.entity.Merchant;
-import com.shoggoth.paymentprovider.exception.NotEnoughFoundsException;
 import com.shoggoth.paymentprovider.repository.BankAccountRepository;
 import com.shoggoth.paymentprovider.repository.MerchantRepository;
 import com.shoggoth.paymentprovider.service.MerchantService;
@@ -12,7 +11,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -20,28 +18,28 @@ import java.util.UUID;
 public class MerchantServiceImpl implements MerchantService {
 
     private final MerchantRepository merchantRepository;
+    private final BankAccountRepository bankAccountRepository;
+
 
     @Override
-    public Mono<Merchant> getAuthenticatedMerchant() {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(SecurityContext::getAuthentication)
-                .map(Authentication::getName)
-                .map(UUID::fromString)
-                .flatMap(merchantRepository::findById);
+    public Mono<Merchant> getMerchantById(UUID id) {
+        return merchantRepository.findById(id)
+                .flatMap(this::setBankAccount);
     }
 
     @Override
-    public Mono<Merchant> reserveFounds(Merchant merchant, BigDecimal amount) {
-        return Mono.just(merchant)
-                .flatMap(merchant1 -> {
-                            var currentBalance = merchant1.getBalance();
-                            if (currentBalance.compareTo(amount) < 0) {
-                                return Mono.error(new NotEnoughFoundsException("Not enough founds for pay out."));
-                            } else {
-                                merchant1.setBalance(currentBalance.subtract(amount));
-                                return merchantRepository.save(merchant1);
-                            }
-                        }
+    public Mono<UUID> getAuthenticatedMerchantId() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getName)
+                .map(UUID::fromString);
+    }
+
+    private Mono<Merchant> setBankAccount(Merchant merchant) {
+        return bankAccountRepository.findById(merchant.getBankAccountId())
+                .map(bankAccount -> merchant.toBuilder()
+                        .bankAccount(bankAccount)
+                        .build()
                 );
     }
 }

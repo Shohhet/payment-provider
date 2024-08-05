@@ -3,9 +3,9 @@ package com.shoggoth.paymentprovider.service;
 import com.shoggoth.paymentprovider.entity.Merchant;
 import reactor.core.publisher.Mono;
 
-import java.math.BigDecimal;
+import java.util.UUID;
 
 public interface MerchantService {
-    Mono<Merchant> getAuthenticatedMerchant();
-    Mono<Merchant> reserveFounds(Merchant merchant, BigDecimal amount);
+    Mono<Merchant> getMerchantById(UUID id);
+    Mono<UUID> getAuthenticatedMerchantId();
 }
