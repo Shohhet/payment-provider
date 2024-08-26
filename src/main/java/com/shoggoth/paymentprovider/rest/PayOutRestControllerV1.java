@@ -5,6 +5,7 @@ import com.shoggoth.paymentprovider.dto.CreateTransactionResponse;
 import com.shoggoth.paymentprovider.dto.GetTransactionResponse;
 import com.shoggoth.paymentprovider.entity.TransactionType;
 import com.shoggoth.paymentprovider.service.TransactionService;
+import com.shoggoth.paymentprovider.validation.ConsistentBeginEndTimeInterval;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -42,13 +43,12 @@ public class PayOutRestControllerV1 {
     }
 
     @GetMapping(value = "/list", params = {"start_date", "end_date"})
-    public Flux<GetTransactionResponse> getTopUpTransactionsList(@RequestParam(name = "start_date") @NotNull Long startDate,
-                                                                 @RequestParam(name = "end_date") @NotNull Long endDate) {
+    @ConsistentBeginEndTimeInterval
+    public Flux<GetTransactionResponse> getTopUpTransactionsList(@RequestParam(name = "start_date") @NotNull @Valid Long startDate,
+                                                                 @RequestParam(name = "end_date") @NotNull @Valid Long endDate) {
         var timeZone = ZoneId.systemDefault();
-        return transactionService.getTransactions(
-                PAY_OUT,
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(startDate), timeZone),
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(endDate), timeZone)
-        );
+        LocalDateTime startDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(startDate), timeZone);
+        LocalDateTime endDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(endDate), timeZone);
+        return transactionService.getTransactions(PAY_OUT, startDateTime, endDateTime);
     }
 }

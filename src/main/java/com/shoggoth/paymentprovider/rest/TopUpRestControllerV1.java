@@ -4,6 +4,7 @@ import com.shoggoth.paymentprovider.dto.CreateTransactionRequest;
 import com.shoggoth.paymentprovider.dto.CreateTransactionResponse;
 import com.shoggoth.paymentprovider.dto.GetTransactionResponse;
 import com.shoggoth.paymentprovider.service.TransactionService;
+import com.shoggoth.paymentprovider.validation.ConsistentBeginEndTimeInterval;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -42,6 +43,7 @@ public class TopUpRestControllerV1 {
     }
 
     @GetMapping(value = "/list", params = {"start_date", "end_date"})
+    @ConsistentBeginEndTimeInterval
     public Flux<GetTransactionResponse> getTopUpTransactionsList(@RequestParam(name = "start_date") Long startDate,
                                                                  @RequestParam(name = "end_date") Long endDate) {
         var timeZone = ZoneId.systemDefault();

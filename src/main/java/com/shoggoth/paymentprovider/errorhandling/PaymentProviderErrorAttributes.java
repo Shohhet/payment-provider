@@ -1,12 +1,10 @@
 package com.shoggoth.paymentprovider.errorhandling;
 
 import com.shoggoth.paymentprovider.exception.*;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
@@ -44,11 +42,10 @@ public class PaymentProviderErrorAttributes extends DefaultErrorAttributes {
                 httpStatus = HttpStatus.BAD_REQUEST;
                 handleError(errorList, ex.getErrorCode(), error.getMessage());
             }
-            case TimePeriodException ex -> {
+            case TransactionDataException ex -> {
                 httpStatus = HttpStatus.BAD_REQUEST;
                 handleError(errorList, ex.getErrorCode(), error.getMessage());
             }
-
             case RestException ex -> {
                 httpStatus = HttpStatus.BAD_REQUEST;
                 handleError(errorList, ex.getErrorCode(), error.getMessage());

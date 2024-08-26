@@ -1,7 +1,11 @@
 package com.shoggoth.paymentprovider.service.impl;
 
 import com.shoggoth.paymentprovider.dto.CreateTransactionRequest;
+import com.shoggoth.paymentprovider.dto.CustomerRequestResponse;
+import com.shoggoth.paymentprovider.entity.Customer;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
+import com.shoggoth.paymentprovider.entity.TransactionType;
+import com.shoggoth.paymentprovider.exception.TransactionDataException;
 import com.shoggoth.paymentprovider.mapper.PaymentCardMapper;
 import com.shoggoth.paymentprovider.repository.BankAccountRepository;
 import com.shoggoth.paymentprovider.repository.CustomerRepository;
@@ -15,6 +19,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
+
+import static com.shoggoth.paymentprovider.entity.TransactionType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -42,19 +48,24 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     }
 
     @Override
-    public Mono<PaymentCard> getOrCreatePaymentCard(CreateTransactionRequest requestPayload) {
+    public Mono<PaymentCard> getOrCreatePaymentCard(CreateTransactionRequest requestPayload, TransactionType transactionType) {
 
         return paymentCardRepository.findPaymentCardByNumber(requestPayload.cardData().cardNumber())
-                .doOnSuccess(pc -> log.debug("Get existing payment card: {}", pc))
-                .switchIfEmpty(createNewPaymentCard(requestPayload))
-                .doOnSuccess(pc -> log.debug("Create new payment card: {}", pc))
+                .doOnNext(pc -> log.debug("Get existing payment card: {}", pc))
+                .flatMap(this::setRelatedEntities)
+                .flatMap(paymentCard -> isOwnerDataValid(paymentCard, requestPayload.customer())
+                        ? Mono.just(paymentCard)
+                        : Mono.error(new TransactionDataException("Wrong customer data for existing card.", "TRANSACTION_DATA_ERROR" )))
+                .switchIfEmpty(createNewPaymentCard(requestPayload, transactionType))
+                .doOnNext(pc -> log.debug("Create new payment card: {}", pc))
                 .doOnError(throwable -> log.error("Error creating new payment card: {}", throwable.getMessage()));
-
-
     }
 
-    private Mono<PaymentCard> createNewPaymentCard(CreateTransactionRequest requestPayload) {
+    private Mono<PaymentCard> createNewPaymentCard(CreateTransactionRequest requestPayload, TransactionType transactionType) {
         var paymentCard = paymentCardMapper.requestToPaymentCard(requestPayload.cardData());
+        if (transactionType.equals(PAY_OUT)) {
+            return Mono.error(new TransactionDataException("Payment card does not exist.", "TRANSACTION_DATA_ERROR"));
+        }
         return Mono.zip(Mono.just(paymentCard),
                         customerService.getCustomer(requestPayload.customer()),
                         bankAccountService.createDefaultBankAccount(requestPayload.currency()))
@@ -84,5 +95,11 @@ public class PaymentCardServiceImpl implements PaymentCardService {
                             return paymentCard;
                         }
                 );
+    }
+    private boolean isOwnerDataValid(PaymentCard paymentCard, CustomerRequestResponse customerData) {
+        Customer persistCardOwner = paymentCard.getOwner();
+        return persistCardOwner.getFirstName().equals(customerData.firstName())
+                && persistCardOwner.getLastName().equals(customerData.lastName())
+                && persistCardOwner.getCountryCode().equals(customerData.country());
     }
 }

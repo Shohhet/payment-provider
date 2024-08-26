@@ -5,11 +5,12 @@ import com.shoggoth.paymentprovider.dto.CreateTransactionResponse;
 import com.shoggoth.paymentprovider.dto.GetTransactionResponse;
 import com.shoggoth.paymentprovider.entity.*;
 import com.shoggoth.paymentprovider.exception.NotFoundException;
-import com.shoggoth.paymentprovider.exception.TimePeriodException;
+import com.shoggoth.paymentprovider.exception.TransactionDataException;
 import com.shoggoth.paymentprovider.mapper.TransactionMapper;
 import com.shoggoth.paymentprovider.repository.TransactionRepository;
 import com.shoggoth.paymentprovider.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.reactive.TransactionalOperator;
@@ -32,9 +33,12 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final ProcessingService processingService;
     private final TransactionalOperator transactionalOperator;
+    private final WebHookService webHookService;
 
+    @SneakyThrows
     @Override
     public Mono<CreateTransactionResponse> createTransaction(TransactionType transactionType, CreateTransactionRequest requestPayload) {
+
         var transientTransaction = transactionMapper.createRequestToTransaction(requestPayload)
                 .toBuilder()
                 .createdAt(LocalDateTime.now())
@@ -43,9 +47,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .message("Transaction created.")
                 .type(transactionType)
                 .build();
-        return Mono.zip(Mono.just(transientTransaction),
+
+        return Mono.zip(this.checkTransactionCurrency(transientTransaction),
                         merchantService.getAuthenticatedMerchantId(),
-                        paymentCardService.getOrCreatePaymentCard(requestPayload))
+                        paymentCardService.getOrCreatePaymentCard(requestPayload, transactionType))
                 .map(t -> {
                             Transaction transaction = t.getT1();
                             UUID merchantId = t.getT2();
@@ -62,7 +67,9 @@ public class TransactionServiceImpl implements TransactionService {
                 .as(transactionalOperator::transactional)
                 .doOnSuccess(t -> log.debug("New transaction created: {}", t))
                 .doOnError(throwable -> log.error("Error creating new transaction: {}", throwable.getMessage()))
+                .doOnNext(webHookService::sendWebHook)
                 .map(transactionMapper::transactionToCreateResponse);
+
 
     }
 
@@ -71,6 +78,7 @@ public class TransactionServiceImpl implements TransactionService {
         return merchantService.getAuthenticatedMerchantId()
                 .flatMap(merchantId ->
                         transactionRepository.findByIdAndMerchantIdAndType(transactionId, merchantId, transactionType))
+                .flatMap(this::setRelatedEntities)
                 .switchIfEmpty(Mono.error(new NotFoundException("Transaction with id: %s not found.".formatted(transactionId), "NOT_FOUND_ERROR")))
                 .map(transactionMapper::transactionToGetResponse);
     }
@@ -91,9 +99,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Flux<GetTransactionResponse> getTransactions(TransactionType transactionType, LocalDateTime startDate, LocalDateTime endDate) {
-        if (!startDate.isBefore(endDate)) {
-            return Flux.error(new TimePeriodException("End date is earlier then start date.", "VALIDATION_ERROR"));
-        }
         return merchantService.getAuthenticatedMerchantId()
                 .flatMapMany(merchantId -> transactionRepository.findByCreatedAtBetweenAndMerchantIdAndType(
                         startDate,
@@ -103,7 +108,6 @@ public class TransactionServiceImpl implements TransactionService {
                 )
                 .flatMap(this::setRelatedEntities)
                 .map(transactionMapper::transactionToGetResponse);
-
     }
 
     @Override
@@ -118,7 +122,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .flatMap(this::setRelatedEntities)
                 .flatMap(processingService::process)
                 .as(transactionalOperator::transactional)
-                .doOnSuccess(tr -> log.debug("Transaction accepted: {}", tr));
+                .doOnNext(tr -> {
+                            log.debug("Transaction accepted: {}", tr);
+                            webHookService.sendWebHook(tr);
+                        }
+                )
+                .doOnError(throwable -> log.error("Error accepting transaction: {}", throwable.getMessage()));
     }
 
     @Override
@@ -133,11 +142,16 @@ public class TransactionServiceImpl implements TransactionService {
                 .flatMap(this::setRelatedEntities)
                 .flatMap(processingService::process)
                 .as(transactionalOperator::transactional)
-                .doOnSuccess(tr -> log.debug("Transaction rejected: {}", tr));
+                .doOnNext(tr -> {
+                            log.debug("Transaction rejected: {}", tr);
+                            webHookService.sendWebHook(tr);
+                        }
+                )
+                .doOnError(throwable -> log.error("Error rejecting transaction: {}", throwable.getMessage()));
     }
 
 
-    public Mono<Transaction> setRelatedEntities(Transaction transaction) {
+    private Mono<Transaction> setRelatedEntities(Transaction transaction) {
         return Mono.zip(paymentCardService.getPaymentCardById(transaction.getPaymentCardId()),
                         merchantService.getMerchantById(transaction.getMerchantId())
                 )
@@ -150,6 +164,21 @@ public class TransactionServiceImpl implements TransactionService {
                                     .merchant(merchant)
                                     .build();
                         }
-                ).doOnSuccess(transaction1 -> log.debug("Transaction set related entities: {}", transaction1));
+                )
+                .doOnNext(tr -> log.debug("Transaction set related entities: {}", tr))
+                .doOnError(throwable -> log.error("Error setting related entities: {}", throwable.getMessage()));
+    }
+
+    private Mono<Transaction> checkTransactionCurrency(Transaction transaction) {
+        return merchantService.getAuthenticatedMerchantId()
+                .flatMap(merchantService::getMerchantById)
+                .flatMap(merchant -> {
+                            if (merchant.getBankAccount().getCurrency().equals(transaction.getCurrency())) {
+                                return Mono.just(transaction);
+                            } else {
+                                return Mono.error(new TransactionDataException("Wrong transaction currency.", "TRANSACTION_DATA_ERROR"));
+                            }
+                        }
+                );
     }
 }

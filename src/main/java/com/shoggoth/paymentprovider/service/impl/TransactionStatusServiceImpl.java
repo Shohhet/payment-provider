@@ -26,7 +26,10 @@ public class TransactionStatusServiceImpl implements TransactionStatusService {
     public void handleTransactionsStatuses() {
         transactionRepository.findByStatus(IN_PROGRESS)
                 .flatMap(this::processRandomTransactionStatus)
-                .subscribe();
+                .subscribe(
+                        transaction -> log.debug("Transaction status updated: {}", transaction),
+                        throwable -> log.error("Transaction status update failed: ", throwable)
+                );
     }
 
     private Mono<Transaction> processRandomTransactionStatus(Transaction transaction) {

@@ -17,7 +17,6 @@ import java.util.UUID;
 public class BankAccount {
     @Id
     private UUID id;
-    @Column("balance")
     private BigDecimal balance;
     @Column("currency_code")
     private String currency;

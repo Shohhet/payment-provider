@@ -18,6 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class BankAccountServiceImpl implements BankAccountService {
+
     @Value("${customer-balance.default-amount}")
     private BigDecimal defaultAmount;
     private final BankAccountRepository bankAccountRepository;

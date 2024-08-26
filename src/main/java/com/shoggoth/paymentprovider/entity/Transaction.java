@@ -21,34 +21,39 @@ import java.util.UUID;
 public class Transaction {
     @Id
     private UUID id;
-    @Column("amount")
     private BigDecimal amount;
-    @Column("currency")
     private String currency;
+
     @Column("payment_method")
     private PaymentMethod paymentMethod;
+
     @Column("created_at")
     private LocalDateTime createdAt;
+
     @Column("updated_at")
     private LocalDateTime updatedAt;
-    @Column("type")
     private TransactionType type;
+
     @Column("language_code")
     private String languageCode;
+
     @Column("notification_url")
     private String notificationUrl;
-    @Column("status")
     private TransactionStatus status;
-    @Column("message")
     private String message;
+
     @Column("card_id")
     private UUID paymentCardId;
+
     @Transient
     private PaymentCard card;
+
     @Column("merchant_id")
     private UUID merchantId;
+
     @Transient
     private Merchant merchant;
+
     @Transient
     private Customer customer;
 }

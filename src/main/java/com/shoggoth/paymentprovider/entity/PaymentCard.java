@@ -19,14 +19,10 @@ import java.util.UUID;
 public class PaymentCard {
     @Id
     private UUID id;
-
-    @Column("number")
     private String number;
 
     @Column("expiration_date")
     private LocalDate expirationDate;
-
-    @Column("cvv")
     private String cvv;
 
     @Column("bank_account_Id")

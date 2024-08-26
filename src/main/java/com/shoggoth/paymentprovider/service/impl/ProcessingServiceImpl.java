@@ -17,5 +17,4 @@ public class ProcessingServiceImpl implements ProcessingService {
         return transactionProcessorFactory.getTransactionProcessor(transaction)
                 .flatMap(processor -> processor.process(transaction));
     }
-
 }
