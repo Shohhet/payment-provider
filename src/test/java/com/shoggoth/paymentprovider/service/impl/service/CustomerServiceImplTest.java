@@ -6,6 +6,7 @@ import com.shoggoth.paymentprovider.mapper.CustomerMapperImpl;
 import com.shoggoth.paymentprovider.repository.CustomerRepository;
 import com.shoggoth.paymentprovider.service.impl.CustomerServiceImpl;
 import com.shoggoth.paymentprovider.service.impl.util.TestDataUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -31,7 +32,8 @@ class CustomerServiceImplTest {
 
 
     @Test
-    public void givenCustomerRequest_whenCustomerNotExist_thenNewCustomerIsReturned() {
+    @DisplayName("Test create new customer functionality.")
+    public void givenCustomerRequest_whenCustomerNotExist_thenNewCustomerReturned() {
         //given
         var customerRequest = TestDataUtils.getCustomerRequest();
         var persistedCustomer = TestDataUtils.getPersistedCustomer();
@@ -52,7 +54,8 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    public void givenCustomerRequest_whenCustomerExist_thenExistingCustomerIsReturned() {
+    @DisplayName("Test get existing customer functionality.")
+    public void givenCustomerRequest_whenCustomerExist_thenExistingCustomerReturned() {
         //given
         var customerRequest = TestDataUtils.getCustomerRequest();
         var persistedCustomer = TestDataUtils.getPersistedCustomer();

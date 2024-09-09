@@ -7,7 +7,6 @@ import com.shoggoth.paymentprovider.service.TransactionService;
 import com.shoggoth.paymentprovider.validation.ConsistentBeginEndTimeInterval;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
-import static com.shoggoth.paymentprovider.entity.TransactionType.PAY_OUT;
 import static com.shoggoth.paymentprovider.entity.TransactionType.TOP_UP;
 
 @RestController

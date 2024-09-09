@@ -27,19 +27,12 @@ import static com.shoggoth.paymentprovider.entity.TransactionType.*;
 @Slf4j
 public class PaymentCardServiceImpl implements PaymentCardService {
 
-    private final CustomerService customerService;
     private final PaymentCardMapper paymentCardMapper;
     private final PaymentCardRepository paymentCardRepository;
-    private final BankAccountService bankAccountService;
+    private final CustomerService customerService;
     private final CustomerRepository customerRepository;
+    private final BankAccountService bankAccountService;
     private final BankAccountRepository bankAccountRepository;
-
-
-    @Override
-    public Mono<PaymentCard> getPaymentCardByNumber(String cardNumber) {
-        return paymentCardRepository.findPaymentCardByNumber(cardNumber)
-                .flatMap(this::setRelatedEntities);
-    }
 
     @Override
     public Mono<PaymentCard> getPaymentCardById(UUID id) {
@@ -55,7 +48,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
                 .flatMap(this::setRelatedEntities)
                 .flatMap(paymentCard -> isOwnerDataValid(paymentCard, requestPayload.customer())
                         ? Mono.just(paymentCard)
-                        : Mono.error(new TransactionDataException("Wrong customer data for existing card.", "TRANSACTION_DATA_ERROR" )))
+                        : Mono.error(new TransactionDataException("Wrong customer data for existing card.", "TRANSACTION_DATA_ERROR")))
                 .switchIfEmpty(createNewPaymentCard(requestPayload, transactionType))
                 .doOnNext(pc -> log.debug("Create new payment card: {}", pc))
                 .doOnError(throwable -> log.error("Error creating new payment card: {}", throwable.getMessage()));
@@ -96,6 +89,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
                         }
                 );
     }
+
     private boolean isOwnerDataValid(PaymentCard paymentCard, CustomerRequestResponse customerData) {
         Customer persistCardOwner = paymentCard.getOwner();
         return persistCardOwner.getFirstName().equals(customerData.firstName())

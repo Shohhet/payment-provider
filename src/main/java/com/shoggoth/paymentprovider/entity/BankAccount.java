@@ -1,6 +1,7 @@
 package com.shoggoth.paymentprovider.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bank_account")
+@Builder(toBuilder = true)
 public class BankAccount {
     @Id
     private UUID id;
