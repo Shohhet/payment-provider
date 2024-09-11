@@ -24,6 +24,7 @@ public class TestDataUtils {
     public static String CURRENCY = "EUR";
     public static String LANGUAGE = "ru";
     public static String FIRST_NAME = "Ivan";
+    public static String WRONG_FIRST_NAME = "Petr";
     public static String LAST_NAME = "Ivanov";
     public static String COUNTRY = "RU";
     public static String NOTIFICATION_URL = "https://proselyte.net/webhook/transaction";
@@ -83,6 +84,14 @@ public class TestDataUtils {
         );
     }
 
+    public static CustomerRequestResponse getWrongCustomerRequestResponse() {
+        return new CustomerRequestResponse(
+                WRONG_FIRST_NAME,
+                LAST_NAME,
+                COUNTRY
+        );
+    }
+
     public static CreateTransactionRequest getCreateTransactionRequest() {
         return new CreateTransactionRequest(
                 PaymentMethod.CARD,
@@ -92,6 +101,17 @@ public class TestDataUtils {
                 LANGUAGE,
                 NOTIFICATION_URL,
                 getCustomerRequestResponse()
+        );
+    }
+    public static CreateTransactionRequest getCreateTransactionRequestWithWrongCustomerData() {
+        return new CreateTransactionRequest(
+                PaymentMethod.CARD,
+                TRANSACTION_AMOUNT,
+                CURRENCY,
+                getPaymentCardRequest(),
+                LANGUAGE,
+                NOTIFICATION_URL,
+                getWrongCustomerRequestResponse()
         );
     }
 }

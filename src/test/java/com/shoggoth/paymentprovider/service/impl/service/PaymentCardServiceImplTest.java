@@ -3,6 +3,7 @@ package com.shoggoth.paymentprovider.service.impl.service;
 import com.shoggoth.paymentprovider.dto.CustomerRequestResponse;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
 import com.shoggoth.paymentprovider.entity.TransactionType;
+import com.shoggoth.paymentprovider.exception.TransactionDataException;
 import com.shoggoth.paymentprovider.mapper.PaymentCardMapper;
 import com.shoggoth.paymentprovider.mapper.PaymentCardMapperImpl;
 import com.shoggoth.paymentprovider.repository.BankAccountRepository;
@@ -10,20 +11,14 @@ import com.shoggoth.paymentprovider.repository.CustomerRepository;
 import com.shoggoth.paymentprovider.repository.PaymentCardRepository;
 import com.shoggoth.paymentprovider.service.BankAccountService;
 import com.shoggoth.paymentprovider.service.CustomerService;
-import com.shoggoth.paymentprovider.service.PaymentCardService;
 import com.shoggoth.paymentprovider.service.impl.PaymentCardServiceImpl;
-import com.shoggoth.paymentprovider.service.impl.util.TestDataUtils;
-import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -91,6 +86,49 @@ class PaymentCardServiceImplTest {
                 .verifyComplete();
     }
 
+    @Test
+    @DisplayName("")
+    void givenPayOutTransaction_WhenPaymentCardExistAndCustomerValid_ThenReturnExistingPaymentCard() {
+        //given
+        when(customerRepository.findById(any(UUID.class))).thenReturn(Mono.just(getPersistedCustomer()));
+        when(bankAccountRepository.findById(any(UUID.class))).thenReturn(Mono.just(getPersistedBankAccount()));
+        when(paymentCardRepository.findPaymentCardByNumber(any(String.class))).thenReturn(Mono.just(getPersistedPaymentCard()));
 
+        //when
+        StepVerifier.create(paymentCardService.getOrCreatePaymentCard(getCreateTransactionRequest(), TransactionType.PAY_OUT))
+                //then
+                .consumeNextWith(result -> assertEquals(result, getPersistedPaymentCard()))
+                .verifyComplete();
+    }
 
+    @Test
+    @DisplayName("Test error then payment card doesn't exist for pay out transaction.")
+    void givenPayOutTransaction_WhenPaymentCardDoesNotExist_ThenThrowException() {
+        //given
+        when(paymentCardRepository.findPaymentCardByNumber(any(String.class))).thenReturn(Mono.empty());
+        //when
+        StepVerifier.create(paymentCardService.getOrCreatePaymentCard(getCreateTransactionRequest(), TransactionType.PAY_OUT))
+                //then
+                .expectErrorMatches(throwable ->
+                        throwable instanceof TransactionDataException && throwable.getMessage().equals("Payment card does not exist.")
+                )
+                .verify();
+    }
+
+    @Test
+    @DisplayName("Test error then customer data from request doesn't match data from database for top up transaction.")
+    void givenTopUpTransaction_WhenPaymentCardExistAndCustomerNotValid_ThenThrowException() {
+        //given
+        when(customerRepository.findById(any(UUID.class))).thenReturn(Mono.just(getPersistedCustomer()));
+        when(bankAccountRepository.findById(any(UUID.class))).thenReturn(Mono.just(getPersistedBankAccount()));
+        when(paymentCardRepository.findPaymentCardByNumber(any(String.class))).thenReturn(Mono.just(getPersistedPaymentCard()));
+
+        //when
+        StepVerifier.create(paymentCardService.getOrCreatePaymentCard(getCreateTransactionRequestWithWrongCustomerData(), TransactionType.PAY_OUT))
+                //then
+                .expectErrorMatches(throwable ->
+                    throwable instanceof TransactionDataException && throwable.getMessage().equals("Wrong customer data for existing card.")
+                )
+                .verify();
+    }
 }
