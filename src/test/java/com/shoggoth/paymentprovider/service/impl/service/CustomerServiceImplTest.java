@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import static com.shoggoth.paymentprovider.service.impl.util.TestDataUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -35,8 +36,8 @@ class CustomerServiceImplTest {
     @DisplayName("Test create new customer functionality.")
     public void givenCustomerRequest_whenCustomerNotExist_thenNewCustomerReturned() {
         //given
-        var customerRequest = TestDataUtils.getCustomerRequest();
-        var persistedCustomer = TestDataUtils.getPersistedCustomer();
+        var customerRequest = getCustomerRequest();
+        var persistedCustomer = getPersistedCustomer();
         when(customerRepository.findCustomerByFirstNameAndLastNameAndCountryCode(anyString(), anyString(), anyString()))
                 .thenReturn(Mono.empty());
 
@@ -57,12 +58,11 @@ class CustomerServiceImplTest {
     @DisplayName("Test get existing customer functionality.")
     public void givenCustomerRequest_whenCustomerExist_thenExistingCustomerReturned() {
         //given
-        var customerRequest = TestDataUtils.getCustomerRequest();
-        var persistedCustomer = TestDataUtils.getPersistedCustomer();
-        //when
+        var customerRequest = getCustomerRequest();
+        var persistedCustomer = getPersistedCustomer();
         when(customerRepository.findCustomerByFirstNameAndLastNameAndCountryCode(anyString(), anyString(), anyString()))
                 .thenReturn(Mono.just(persistedCustomer));
-
+        //when
         StepVerifier.create(customerService.getCustomer(customerRequest))
 
                 //then

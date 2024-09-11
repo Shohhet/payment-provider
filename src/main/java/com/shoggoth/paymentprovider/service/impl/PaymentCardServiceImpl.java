@@ -73,8 +73,6 @@ public class PaymentCardServiceImpl implements PaymentCardService {
                 )
                 .flatMap(paymentCardRepository::save)
                 .flatMap(this::setRelatedEntities);
-
-
     }
 
     private Mono<PaymentCard> setRelatedEntities(PaymentCard paymentCard) {
