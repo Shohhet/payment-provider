@@ -3,10 +3,7 @@ package com.shoggoth.paymentprovider.service.impl.util;
 import com.shoggoth.paymentprovider.dto.CreateTransactionRequest;
 import com.shoggoth.paymentprovider.dto.CustomerRequestResponse;
 import com.shoggoth.paymentprovider.dto.PaymentCardRequest;
-import com.shoggoth.paymentprovider.entity.BankAccount;
-import com.shoggoth.paymentprovider.entity.Customer;
-import com.shoggoth.paymentprovider.entity.PaymentCard;
-import com.shoggoth.paymentprovider.entity.PaymentMethod;
+import com.shoggoth.paymentprovider.entity.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +13,7 @@ import java.util.UUID;
 
 public class TestDataUtils {
     public static UUID ACCOUNT_ID = UUID.randomUUID();
+    public static UUID MERCHANT_ID = UUID.randomUUID();
     public static UUID PAYMENT_CARD_ID = UUID.randomUUID();
     public static UUID CUSTOMER_ID = UUID.randomUUID();
     public static LocalDate EXPIRATION_DATE = LocalDate.of(Year.now().getValue() + 1, 1, 31);
@@ -27,6 +25,7 @@ public class TestDataUtils {
     public static String LAST_NAME = "Ivanov";
     public static String COUNTRY = "RU";
     public static String NOTIFICATION_URL = "https://proselyte.net/webhook/transaction";
+    public static String SECRET_KEY = "12345";
     public static BigDecimal INITIAL_ACCOUNT_AMOUNT = new BigDecimal("1000.00");
     public static BigDecimal TRANSACTION_AMOUNT = new BigDecimal("100.00");
     public static BigDecimal TOO_BIG_TRANSACTION_AMOUNT = new BigDecimal("1100.00");
@@ -93,5 +92,19 @@ public class TestDataUtils {
                 NOTIFICATION_URL,
                 getCustomerRequestResponse()
         );
+    }
+
+    public static Merchant getMerchant() {
+        return Merchant.builder()
+                .id(MERCHANT_ID)
+                .secretKey(SECRET_KEY)
+                .bankAccountId(ACCOUNT_ID)
+                .bankAccount(getPersistedBankAccount())
+                .build();
+    }
+
+    public static Transaction getTopUpTransaction() {
+        return Transaction.builder()
+                .build();
     }
 }

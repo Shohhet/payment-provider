@@ -44,8 +44,7 @@ public class WebHookServiceImpl implements WebHookService {
                 .body(Mono.just(requestBody), GetTransactionResponse.class)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, response ->
-                        response
-                                .toEntity(WebhookResponse.class)
+                        response.toEntity(WebhookResponse.class)
                                 .flatMap(responseEntity -> {
                                             saveWebhook(transaction, responseEntity, retryCounter.intValue());
                                             return Mono.error(new SendWebhookException(Objects.requireNonNull(responseEntity.getBody()).message(), "WEB_CLIENT_ERROR"));
