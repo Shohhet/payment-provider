@@ -2,10 +2,14 @@ package com.shoggoth.paymentprovider.mapper;
 
 import com.shoggoth.paymentprovider.dto.*;
 import com.shoggoth.paymentprovider.entity.Transaction;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {PaymentCardMapper.class, CustomerMapper.class, PaymentMethodMapper.class})
+@Mapper(componentModel = "spring",
+        uses = {PaymentCardMapper.class, CustomerMapper.class, PaymentMethodMapper.class},
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR
+)
 public interface TransactionMapper {
 
     @Mapping(target = "id", ignore = true)

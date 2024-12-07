@@ -44,7 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .status(IN_PROGRESS)
-                .message("Transaction created.")
+                .message(IN_PROGRESS.getMessage())
                 .type(transactionType)
                 .build();
 
@@ -116,7 +116,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.toBuilder()
                                 .updatedAt(LocalDateTime.now())
                                 .status(APPROVED)
-                                .message("Transaction approved.")
+                                .message(APPROVED.getMessage())
                                 .build()
                 )
                 .flatMap(this::setRelatedEntities)
@@ -136,7 +136,7 @@ public class TransactionServiceImpl implements TransactionService {
                         transaction.toBuilder()
                                 .updatedAt(LocalDateTime.now())
                                 .status(FAILED)
-                                .message("Transaction failed.")
+                                .message(FAILED.getMessage())
                                 .build()
                 )
                 .flatMap(this::setRelatedEntities)

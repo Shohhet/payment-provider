@@ -7,19 +7,26 @@ import com.shoggoth.paymentprovider.entity.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.UUID;
+
+import static com.shoggoth.paymentprovider.entity.PaymentMethod.*;
+import static com.shoggoth.paymentprovider.entity.TransactionStatus.*;
+import static com.shoggoth.paymentprovider.entity.TransactionType.*;
 
 public class TestDataUtils {
     public static UUID ACCOUNT_ID = UUID.randomUUID();
     public static UUID MERCHANT_ID = UUID.randomUUID();
     public static UUID PAYMENT_CARD_ID = UUID.randomUUID();
     public static UUID CUSTOMER_ID = UUID.randomUUID();
+    public static UUID TRANSACTION_ID = UUID.randomUUID();
     public static LocalDate EXPIRATION_DATE = LocalDate.of(Year.now().getValue() + 1, 1, 31);
     public static String PAYMENT_CARD_NUMBER = "370000000100018";
     public static String CVV = "111";
     public static String CURRENCY = "EUR";
+    public static String WRONG_CURRENCY = "RUB";
     public static String LANGUAGE = "ru";
     public static String FIRST_NAME = "Ivan";
     public static String LAST_NAME = "Ivanov";
@@ -84,9 +91,21 @@ public class TestDataUtils {
 
     public static CreateTransactionRequest getCreateTransactionRequest() {
         return new CreateTransactionRequest(
-                PaymentMethod.CARD,
+                CARD,
                 TRANSACTION_AMOUNT,
                 CURRENCY,
+                getPaymentCardRequest(),
+                LANGUAGE,
+                NOTIFICATION_URL,
+                getCustomerRequestResponse()
+        );
+    }
+
+    public static CreateTransactionRequest getCreateTransactionRequestWithWrongCurrency() {
+        return new CreateTransactionRequest(
+                CARD,
+                TRANSACTION_AMOUNT,
+                WRONG_CURRENCY,
                 getPaymentCardRequest(),
                 LANGUAGE,
                 NOTIFICATION_URL,
@@ -105,6 +124,19 @@ public class TestDataUtils {
 
     public static Transaction getTopUpTransaction() {
         return Transaction.builder()
+                .id(TRANSACTION_ID)
+                .amount(TRANSACTION_AMOUNT)
+                .currency(CURRENCY)
+                .paymentMethod(CARD)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .type(TOP_UP)
+                .languageCode(LANGUAGE)
+                .notificationUrl(NOTIFICATION_URL)
+                .status(IN_PROGRESS)
+                .message(IN_PROGRESS.getMessage())
+                .paymentCardId(PAYMENT_CARD_ID)
+                .merchantId(MERCHANT_ID)
                 .build();
     }
 }

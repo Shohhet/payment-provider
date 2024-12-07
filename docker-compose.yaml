@@ -3,7 +3,7 @@ services:
     container_name: payment-provider-db
     image: postgres:latest
     ports:
-      - 5433:5432
+      - "5433:5432"
     environment:
       - POSTGRES_USER=dev
       - POSTGRES_PASSWORD=pass
