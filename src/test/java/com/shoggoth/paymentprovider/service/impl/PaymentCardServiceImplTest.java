@@ -1,19 +1,16 @@
-package com.shoggoth.paymentprovider.service.impl.service;
+package com.shoggoth.paymentprovider.service.impl;
 
 import com.shoggoth.paymentprovider.dto.CustomerRequestResponse;
 import com.shoggoth.paymentprovider.entity.PaymentCard;
 import com.shoggoth.paymentprovider.entity.TransactionType;
-import com.shoggoth.paymentprovider.mapper.CustomerMapperImpl;
 import com.shoggoth.paymentprovider.exception.TransactionDataException;
 import com.shoggoth.paymentprovider.mapper.PaymentCardMapper;
 import com.shoggoth.paymentprovider.mapper.PaymentCardMapperImpl;
-import com.shoggoth.paymentprovider.mapper.TransactionMapperImpl;
 import com.shoggoth.paymentprovider.repository.BankAccountRepository;
 import com.shoggoth.paymentprovider.repository.CustomerRepository;
 import com.shoggoth.paymentprovider.repository.PaymentCardRepository;
 import com.shoggoth.paymentprovider.service.BankAccountService;
 import com.shoggoth.paymentprovider.service.CustomerService;
-import com.shoggoth.paymentprovider.service.impl.PaymentCardServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,14 +18,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.UUID;
 
-import static com.shoggoth.paymentprovider.service.impl.util.TestDataUtils.*;
+import static com.shoggoth.paymentprovider.util.TestDataUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

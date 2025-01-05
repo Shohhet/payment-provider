@@ -21,7 +21,10 @@ public class SecurityConfiguration {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity) {
         return httpSecurity
-                .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec.anyExchange().authenticated())
+                .authorizeExchange(authorizeExchangeSpec ->
+                        authorizeExchangeSpec
+                                .pathMatchers("/webjars/**", "/v3/api-doc/**", "/swagger-ui.html/", "/swagger-ui/**").permitAll()
+                                .anyExchange().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)

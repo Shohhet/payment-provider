@@ -1,11 +1,10 @@
-package com.shoggoth.paymentprovider.service.impl.service;
+package com.shoggoth.paymentprovider.service.impl;
 
 import com.shoggoth.paymentprovider.entity.Transaction;
 import com.shoggoth.paymentprovider.exception.TransactionDataException;
 import com.shoggoth.paymentprovider.mapper.*;
 import com.shoggoth.paymentprovider.repository.TransactionRepository;
 import com.shoggoth.paymentprovider.service.*;
-import com.shoggoth.paymentprovider.service.impl.TransactionServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -18,7 +17,7 @@ import java.util.UUID;
 
 import static com.shoggoth.paymentprovider.entity.TransactionStatus.IN_PROGRESS;
 import static com.shoggoth.paymentprovider.entity.TransactionType.TOP_UP;
-import static com.shoggoth.paymentprovider.service.impl.util.TestDataUtils.*;
+import static com.shoggoth.paymentprovider.util.TestDataUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;

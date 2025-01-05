@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
+import static com.shoggoth.paymentprovider.entity.TransactionType.PAY_OUT;
 import static com.shoggoth.paymentprovider.entity.TransactionType.TOP_UP;
 
 @RestController
@@ -26,17 +27,17 @@ public class TopUpRestControllerV1 {
     private final TransactionService transactionService;
 
     @PostMapping("/")
-    public Mono<CreateTransactionResponse> createPayOutTransaction(@RequestBody @Valid CreateTransactionRequest payload) {
+    public Mono<CreateTransactionResponse> createTopUpTransaction(@RequestBody @Valid CreateTransactionRequest payload) {
         return transactionService.createTransaction(TOP_UP, payload);
     }
 
     @GetMapping("/{id}/details")
-    public Mono<GetTransactionResponse> getPayOutTransaction(@PathVariable UUID id) {
+    public Mono<GetTransactionResponse> getTopUpTransaction(@PathVariable UUID id) {
         return transactionService.getTransactionDetails(TOP_UP, id);
     }
 
     @GetMapping("/list")
-    public Flux<GetTransactionResponse> getPayOutTransactionsList() {
+    public Flux<GetTransactionResponse> getTopUpTransactionsList() {
         return transactionService.getTransactions(TOP_UP);
     }
 
@@ -45,11 +46,9 @@ public class TopUpRestControllerV1 {
     public Flux<GetTransactionResponse> getTopUpTransactionsList(@RequestParam(name = "start_date") Long startDate,
                                                                  @RequestParam(name = "end_date") Long endDate) {
         var timeZone = ZoneId.systemDefault();
-        return transactionService.getTransactions(
-                TOP_UP,
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(startDate), timeZone),
-                LocalDateTime.ofInstant(Instant.ofEpochMilli(endDate), timeZone)
-        );
+        LocalDateTime startDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(startDate), timeZone);
+        LocalDateTime endDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(endDate), timeZone);
+        return transactionService.getTransactions(TOP_UP, startDateTime, endDateTime);
     }
 
 }

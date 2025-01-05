@@ -1,11 +1,9 @@
-package com.shoggoth.paymentprovider.service.impl.service;
+package com.shoggoth.paymentprovider.service.impl;
 
 import com.shoggoth.paymentprovider.entity.Customer;
 import com.shoggoth.paymentprovider.mapper.CustomerMapper;
 import com.shoggoth.paymentprovider.mapper.CustomerMapperImpl;
 import com.shoggoth.paymentprovider.repository.CustomerRepository;
-import com.shoggoth.paymentprovider.service.impl.CustomerServiceImpl;
-import com.shoggoth.paymentprovider.service.impl.util.TestDataUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static com.shoggoth.paymentprovider.service.impl.util.TestDataUtils.*;
+import static com.shoggoth.paymentprovider.util.TestDataUtils.getCustomerRequest;
+import static com.shoggoth.paymentprovider.util.TestDataUtils.getPersistedCustomer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;

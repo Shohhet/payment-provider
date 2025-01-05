@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,17 +22,22 @@ import java.util.UUID;
 public class Transaction {
     @Id
     private UUID id;
+
     private BigDecimal amount;
+
     private String currency;
 
     @Column("payment_method")
     private PaymentMethod paymentMethod;
 
     @Column("created_at")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime createdAt;
 
     @Column("updated_at")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime updatedAt;
+
     private TransactionType type;
 
     @Column("language_code")
@@ -39,7 +45,9 @@ public class Transaction {
 
     @Column("notification_url")
     private String notificationUrl;
+
     private TransactionStatus status;
+
     private String message;
 
     @Column("card_id")

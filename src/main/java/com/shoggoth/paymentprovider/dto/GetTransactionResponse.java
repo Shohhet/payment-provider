@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record GetTransactionResponse(
@@ -16,13 +17,10 @@ public record GetTransactionResponse(
         String amount,
         String currency,
         UUID transactionId,
-
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.mss")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime createdAt,
-
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.mss")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime updatedAt,
-
         PaymentCardResponse cardData,
         String language,
         String notificationUrl,

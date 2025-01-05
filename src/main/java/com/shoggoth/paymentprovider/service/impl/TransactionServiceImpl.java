@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static com.shoggoth.paymentprovider.entity.TransactionStatus.*;
@@ -41,8 +42,8 @@ public class TransactionServiceImpl implements TransactionService {
 
         var transientTransaction = transactionMapper.createRequestToTransaction(requestPayload)
                 .toBuilder()
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
+                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
                 .status(IN_PROGRESS)
                 .message(IN_PROGRESS.getMessage())
                 .type(transactionType)
@@ -88,7 +89,7 @@ public class TransactionServiceImpl implements TransactionService {
         return merchantService.getAuthenticatedMerchantId()
                 .flatMapMany(merchantId -> transactionRepository.findByCreatedAtBetweenAndMerchantIdAndType(
                         LocalDate.now().atStartOfDay(),
-                        LocalDateTime.now(),
+                        LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS),
                         merchantId,
                         transactionType)
                 )
@@ -114,7 +115,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> acceptTransaction(Transaction transaction) {
         return transactionRepository.save(
                         transaction.toBuilder()
-                                .updatedAt(LocalDateTime.now())
+                                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
                                 .status(APPROVED)
                                 .message(APPROVED.getMessage())
                                 .build()
@@ -134,7 +135,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Mono<Transaction> rejectTransaction(Transaction transaction) {
         return transactionRepository.save(
                         transaction.toBuilder()
-                                .updatedAt(LocalDateTime.now())
+                                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
                                 .status(FAILED)
                                 .message(FAILED.getMessage())
                                 .build()

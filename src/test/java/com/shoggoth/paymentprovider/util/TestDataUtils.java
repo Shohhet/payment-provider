@@ -1,4 +1,4 @@
-package com.shoggoth.paymentprovider.service.impl.util;
+package com.shoggoth.paymentprovider.util;
 
 import com.shoggoth.paymentprovider.dto.CreateTransactionRequest;
 import com.shoggoth.paymentprovider.dto.CustomerRequestResponse;
@@ -6,10 +6,11 @@ import com.shoggoth.paymentprovider.dto.PaymentCardRequest;
 import com.shoggoth.paymentprovider.entity.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.YearMonth;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static com.shoggoth.paymentprovider.entity.PaymentMethod.*;
@@ -23,6 +24,7 @@ public class TestDataUtils {
     public static UUID CUSTOMER_ID = UUID.randomUUID();
     public static UUID TRANSACTION_ID = UUID.randomUUID();
     public static LocalDate EXPIRATION_DATE = LocalDate.of(Year.now().getValue() + 1, 1, 31);
+    public static String STRING_EXPIRATION_DATE = convertExpirationDate(EXPIRATION_DATE);
     public static String PAYMENT_CARD_NUMBER = "370000000100018";
     public static String CVV = "111";
     public static String CURRENCY = "EUR";
@@ -37,7 +39,8 @@ public class TestDataUtils {
     public static BigDecimal INITIAL_ACCOUNT_AMOUNT = new BigDecimal("1000.00");
     public static BigDecimal TRANSACTION_AMOUNT = new BigDecimal("100.00");
     public static BigDecimal TOO_BIG_TRANSACTION_AMOUNT = new BigDecimal("1100.00");
-
+    public static LocalDateTime CREATED_AT = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
+    public static LocalDateTime UPDATED_AT = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
     public static CustomerRequestResponse getCustomerRequest() {
         return new CustomerRequestResponse(
@@ -131,21 +134,17 @@ public class TestDataUtils {
                 .build();
     }
 
-    public static Transaction getTopUpTransaction() {
+    public static Transaction getTransaction() {
         return Transaction.builder()
-                .id(TRANSACTION_ID)
                 .amount(TRANSACTION_AMOUNT)
                 .currency(CURRENCY)
                 .paymentMethod(CARD)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .type(TOP_UP)
+                .createdAt(CREATED_AT)
+                .updatedAt(UPDATED_AT)
                 .languageCode(LANGUAGE)
                 .notificationUrl(NOTIFICATION_URL)
                 .status(IN_PROGRESS)
                 .message(IN_PROGRESS.getMessage())
-                .paymentCardId(PAYMENT_CARD_ID)
-                .merchantId(MERCHANT_ID)
                 .build();
     }
     public static CreateTransactionRequest getCreateTransactionRequestWithWrongCustomerData() {
@@ -158,5 +157,10 @@ public class TestDataUtils {
                 NOTIFICATION_URL,
                 getWrongCustomerRequestResponse()
         );
+    }
+
+    public static String convertExpirationDate(LocalDate date) {
+
+        return date.format(DateTimeFormatter.ofPattern("MM/yy"));
     }
 }

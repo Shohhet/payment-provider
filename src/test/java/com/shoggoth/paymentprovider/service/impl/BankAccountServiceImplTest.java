@@ -1,10 +1,9 @@
-package com.shoggoth.paymentprovider.service.impl.service;
+package com.shoggoth.paymentprovider.service.impl;
 
 import com.shoggoth.paymentprovider.entity.BankAccount;
 import com.shoggoth.paymentprovider.exception.NotEnoughFundsException;
 import com.shoggoth.paymentprovider.repository.BankAccountRepository;
-import com.shoggoth.paymentprovider.service.impl.BankAccountServiceImpl;
-import com.shoggoth.paymentprovider.service.impl.util.TestDataUtils;
+import com.shoggoth.paymentprovider.util.TestDataUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static com.shoggoth.paymentprovider.service.impl.util.TestDataUtils.*;
+import static com.shoggoth.paymentprovider.util.TestDataUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

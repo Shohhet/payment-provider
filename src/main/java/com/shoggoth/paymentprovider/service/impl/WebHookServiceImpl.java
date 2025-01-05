@@ -22,6 +22,7 @@ import reactor.util.retry.RetryBackoffSpec;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,8 +38,12 @@ public class WebHookServiceImpl implements WebHookService {
     @SneakyThrows
     public void sendWebHook(Transaction transaction) {
         AtomicInteger retryCounter = new AtomicInteger(1);
-        RetryBackoffSpec retryBackoffSpec = Retry.fixedDelay(5, Duration.ofSeconds(10)).doBeforeRetry(retrySignal -> retryCounter.getAndIncrement());
+
+        RetryBackoffSpec retryBackoffSpec = Retry.fixedDelay(5, Duration.ofSeconds(10))
+                .doBeforeRetry(retrySignal -> retryCounter.getAndIncrement());
+
         GetTransactionResponse requestBody = transactionMapper.transactionToGetResponse(transaction);
+
         webClient.post()
                 .uri(transaction.getNotificationUrl())
                 .body(Mono.just(requestBody), GetTransactionResponse.class)
@@ -70,7 +75,7 @@ public class WebHookServiceImpl implements WebHookService {
                 .transaction(transaction)
                 .responseStatus(responseEntity.getStatusCode().value())
                 .responseBody(jsonResponseBody)
-                .createdAt(LocalDateTime.now())
+                .createdAt(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS))
                 .build();
         webHookRepository.save(webHook).subscribe();
     }

@@ -20,30 +20,38 @@ import java.util.UUID;
 import static com.shoggoth.paymentprovider.entity.TransactionType.PAY_OUT;
 
 @RestController
-@RequestMapping("api/v1/payments/payout")
+@RequestMapping(PayOutRestControllerV1.PAYOUT_CONTROLLER_URL)
 @RequiredArgsConstructor
 public class PayOutRestControllerV1 {
+
+    public static final String PAYOUT_CONTROLLER_URL = "api/v1/payments/payout";
+    public static final String PAYOUT_CONTROLLER_CREATE_TRANSACTION_URL = "/";
+    public static final String PAYOUT_CONTROLLER_GET_TRANSACTION_URL = "/{id}/details";
+    public static final String PAYOUT_CONTROLLER_GET_TRANSACTION_LIST_URL = "/list";
+    public static final String START_DATE_PARAM = "start_date";
+    public static final String END_DATE_PARAM = "end_date";
+
     private final TransactionService transactionService;
 
-    @PostMapping("/")
+    @PostMapping(PAYOUT_CONTROLLER_CREATE_TRANSACTION_URL)
     public Mono<CreateTransactionResponse> createPayOutTransaction(@RequestBody @Valid CreateTransactionRequest payload) {
         return transactionService.createTransaction(PAY_OUT, payload);
     }
 
-    @GetMapping("/{id}/details")
+    @GetMapping(PAYOUT_CONTROLLER_GET_TRANSACTION_URL)
     public Mono<GetTransactionResponse> getPayOutTransaction(@PathVariable UUID id) {
         return transactionService.getTransactionDetails(PAY_OUT, id);
     }
 
-    @GetMapping("/list")
+    @GetMapping(PAYOUT_CONTROLLER_GET_TRANSACTION_LIST_URL)
     public Flux<GetTransactionResponse> getPayOutTransactionsList() {
         return transactionService.getTransactions(PAY_OUT);
     }
 
-    @GetMapping(value = "/list", params = {"start_date", "end_date"})
+    @GetMapping(value = PAYOUT_CONTROLLER_GET_TRANSACTION_LIST_URL, params = {START_DATE_PARAM, END_DATE_PARAM})
     @ConsistentBeginEndTimeInterval
-    public Flux<GetTransactionResponse> getTopUpTransactionsList(@RequestParam(name = "start_date") @NotNull @Valid Long startDate,
-                                                                 @RequestParam(name = "end_date") @NotNull @Valid Long endDate) {
+    public Flux<GetTransactionResponse> getPayOutTransactionsList(@RequestParam(name = START_DATE_PARAM) @NotNull @Valid Long startDate,
+                                                                 @RequestParam(name = END_DATE_PARAM) @NotNull @Valid Long endDate) {
         var timeZone = ZoneId.systemDefault();
         LocalDateTime startDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(startDate), timeZone);
         LocalDateTime endDateTime = LocalDateTime.ofInstant(Instant.ofEpochSecond(endDate), timeZone);
